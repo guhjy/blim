@@ -8,11 +8,7 @@
 \packageDescription{blim}
 }
 \details{
-
-The DESCRIPTION file:
-\packageDESCRIPTION{blim}
 \packageIndices{blim}
-~~ An overview of how to use the package, including the most important functions ~~
 }
 \author{
 \packageAuthor{blim}
@@ -20,15 +16,30 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{blim}
 }
 \references{
-~~ Literature or other references for background information ~~
+Dynamic tuning procedure using information from
+https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.htm#statug_mcmc_sect022.htm
 }
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation ~~
-~~ directory ~~
-\keyword{ package }
+
+\keyword{ package, blim, bayesian, linear, modelling, univariate }
+
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+
+\code{\link[<blim>:<blim>-function]{<blim>}}
 }
 \examples{
-~~ simple examples of the most important functions ~~
+  # fit the model
+  fit1 <- blim(dist~speed, data=cars)
+
+  # check convergence and autocorrelation
+  cplots(fit1)
+  aplots(fit1)
+
+  # look at results
+  summary(fit1)
+
+  # calculate bayes factor of informative hypothesis
+  BF(fit1, model = "par[1] > par[2]", complement = TRUE)
+
+  # perform posterior predictive check for autocorrelation of residuals
+  DWPPC(fit1)
 }
