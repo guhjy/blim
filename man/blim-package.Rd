@@ -7,9 +7,8 @@
 \description{
 \packageDescription{blim}
 }
-\details{
-\packageIndices{blim}
-}
+
+
 \author{
 \packageAuthor{blim}
 
@@ -24,7 +23,8 @@ https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.ht
 
 \seealso{
 
-\code{\link[<blim>:<blim>-function]{<blim>}}
+\code{\link[<blim>]{blim}}
+
 }
 \examples{
   # fit the model
