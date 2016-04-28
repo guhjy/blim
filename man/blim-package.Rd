@@ -23,7 +23,7 @@ https://support.sas.com/documentation/cdl/en/statug/63033/HTML/default/viewer.ht
 
 \seealso{
 
-\code{\link[<blim:blim>]{blim}}
+\code{\link[<blim.Rd>]{blim}}
 
 }
 \examples{
