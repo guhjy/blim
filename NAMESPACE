@@ -1,0 +1,3 @@
+useDynLib(blim)
+importFrom(Rcpp, evalCpp)
+exportPattern("^[[:alpha:]]+")
