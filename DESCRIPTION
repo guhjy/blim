@@ -4,7 +4,7 @@ Title: Univariate Bayesian Linear Modelling
 Version: 0.1
 Date: 2016-04-28
 Author: Erik-Jan van Kesteren
-Maintainer: vankesteren <github>
+Maintainer: vankesteren
 Description: Univariate Bayesian Linear Modelling
 License: opensource.org/licenses/MIT
 Imports: Rcpp (>= 0.12.4), mvtnorm
