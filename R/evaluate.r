@@ -162,7 +162,7 @@ Turn off the option 'limit' to show all observations (slow!).")
 
 # Autocorrelation Plots ---------------------------------------------------
 
-aplots <- function(blimfit, params = NULL, limit = TRUE){
+aplots <- function(blimfit, params = NULL){
   
   # Check if object has class blimfit
   if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
