@@ -15,7 +15,7 @@ aplots(blimfit, params = NULL)
   \item{blimfit}{ a blimfit object from blim }
   \item{params}{ a vector of indices for the parameters to be displayed }
 }
-}
+
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }

@@ -37,7 +37,7 @@ blim(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
 \item{vebose}{ print all info in the console or not }
 \item{dtuning}{ dynamic tuning of the random walk Metropolis-Hastings step }
 }
-}
+
 \details{
 %%  ~~ If necessary, more details than the description above ~~
 }
