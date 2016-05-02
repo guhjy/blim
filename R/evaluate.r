@@ -21,13 +21,13 @@ BF <- function(blimfit, model = "par[1] < par[2]", complement = F){
   # variance and R-squared columns)
   trace <- blimfit$trace[,-c(1,ncol(blimfit$trace))]
   
-  # Create evaluable expressions for priors
+  # Create evaluable expressions for priors from which we can sample
   p <- lapply(lapply(lapply(strsplit(blimfit$priors, "(", fixed = T),
                             function(x)append(x,"(nrow(trace),", after = 1)),
                      function(x)paste(x,collapse="")),
               function(x)paste("r",substr(x,2,nchar(x)), sep = ""))
   
-  # Create a matrix of prior information NOTE that with few iterations this is
+  # Create a trace of prior information NOTE that with few iterations this is
   # just a rough approximation as this random sequence is NOT taken from the 
   # Markov chain directly. Asymptotically, this becomes more precise.
   prior <- matrix(unlist(lapply(p,function(x)eval(parse(text=x)))),
@@ -41,6 +41,8 @@ BF <- function(blimfit, model = "par[1] < par[2]", complement = F){
   # Evaluate complexity of the hypothesis
   ca <- mean(apply(prior, 1, function(par) eval(parse(text=model))))
   
+  # We can evaluate the BF against unconstrained hypothesis or against its
+  # complement.
   if (complement == F){
     BFau <- fa/ca 
     # Bayes factor against the unconstrained hypothesis
