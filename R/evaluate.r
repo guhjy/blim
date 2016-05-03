@@ -10,6 +10,36 @@ summary.blimfit <- function(x,...){
   print(x$summary)
 }
 
+
+# DIC ---------------------------------------------------------------------
+
+DIC <- function(blimfit){
+  
+  # Check if object has class blimfit
+  if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
+  
+  # Remove unnecessary information from the posterior distributions (the
+  # R-squared column)
+  trace <- blimfit$trace[,-c(ncol(blimfit$trace))]
+  
+  # likelihood under average of parameter estimates
+  Dhat <- -2*log(prod(dnorm(blimfit$y,
+                            blimfit$X%*%colMeans(trace[,-1]),
+                            mean(trace[,1]))))
+  
+  #  Average likelihood of model for each sample
+  Dbar <- -2*log(mean(apply(trace,1,
+                            function(x)prod(dnorm(blimfit$y,
+                                                  blimfit$X%*%x[-1],
+                                                  x[1])))))
+  
+  DIC <- Dhat + 2 * (Dbar - Dhat)
+  
+  return(DIC)
+}
+
+
+
 # Bayes Factor ------------------------------------------------------------
 
 BF <- function(blimfit, model = "par[1] < par[2]", complement = F){
