@@ -165,7 +165,7 @@ blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
                   auto = autocor, 
                   y = y, X = X, 
                   trace = trace, 
-                  priors = prior_b)
+                  priors = c(prior_tau,prior_b))
   class(blimfit) <- "blimfit"
   
   return(blimfit)

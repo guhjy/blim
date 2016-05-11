@@ -42,7 +42,56 @@ DIC <- function(blimfit){
 
 # Bayes Factor ------------------------------------------------------------
 
-BF <- function(blimfit, model = "par[1] < par[2]", complement = F){
+LMml <- function(blimfit){
+  
+  # Laplace - Metropolis Marginal Likelihood using median approximation
+  # Markov Chain Monte Carlo in Practice by Gilks, Richardson & Spiegelhalter
+  # Page 186
+  
+  # Check if object has class blimfit
+  if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
+  
+  # Create log(P(Data | theta))
+  llik <- function(theta,X,y){
+    sum(log(dnorm(y,X%*%theta[-1],theta[1])))
+  }
+  
+  # Create log(P(theta | Model))
+  count <- 0
+  h <- c("","")
+  for (i in strsplit(blimfit$priors, "(", fixed = T)){
+    count <- count+1
+    if (count == 1){
+      h[count]<- paste(append(i, paste("(1/theta[",count,"],",sep = ""), 
+                              after = 1), collapse = "")
+    } else {
+      h[count]<- paste(append(i, paste("(theta[",count,"],",sep = ""), 
+                              after = 1), collapse = "")
+    }
+  }
+  lpriorstring <- paste(paste("log(",h,")", sep = ""),collapse = " + ")
+  
+  lprior <- function(theta)eval(parse(text = lpriorstring))
+  
+  
+  
+  # get the medians (computationally cheap alternative to multivariate mode)
+  medians <- apply(blimfit$trace[,-ncol(blimfit$trace)],2,median) 
+  
+  # trace covmat is an unbiased estimate of the inverse hessian
+  covmat <- cov(blimfit$trace[,-ncol(blimfit$trace)])
+  logdet <- log(det(covmat))
+  
+  hmax <- llik(medians,blimfit$X,blimfit$y)+lprior(medians)
+  
+  return(unname(hmax+0.5*length(medians)*log(2*pi)+0.5*logdet))
+  
+}
+
+
+ICBF <- function(blimfit, model = "par[1] < par[2]", complement = F){
+  
+  # Inequality Constraint Bayes Factor
   
   # Check if object has class blimfit
   if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
