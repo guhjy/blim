@@ -99,9 +99,10 @@ ICBF <- function(blimfit, model = "par[1] < par[2]", complement = F){
   # Remove unnecessary information from the posterior distributions (the
   # variance and R-squared columns)
   trace <- blimfit$trace[,-c(1,ncol(blimfit$trace))]
+  priors <- blimfit$priors[-1]
   
   # Create evaluable expressions for priors from which we can sample
-  p <- lapply(lapply(lapply(strsplit(blimfit$priors, "(", fixed = T),
+  p <- lapply(lapply(lapply(strsplit(priors, "(", fixed = T),
                             function(x)append(x,"(nrow(trace),", after = 1)),
                      function(x)paste(x,collapse="")),
               function(x)paste("r",substr(x,2,nchar(x)), sep = ""))
