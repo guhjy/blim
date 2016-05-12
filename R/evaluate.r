@@ -93,6 +93,9 @@ lmml <- function(blimfit){
 BF <- function(blimfit1, blimfit2, bootstrap = F, plot = F){
   
   # Function to calculate the Bayes Factor of two (nested) models
+  # Not much more than a wrapper around the lmml function!
+  # use bootstrap to see if you need more iterations for accurate estimation
+  # of the bayes factor
   
   if (class(blimfit1) != "blimfit" ||
       class(blimfit2) != "blimfit") stop("Please enter a blimfit object!")
