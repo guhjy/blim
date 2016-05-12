@@ -105,11 +105,13 @@ BF <- function(blimfit1, blimfit2, bootstrap = F, plot = F){
     
     # Calculate bayes factor. remember: lmml returns log marginal likelihood!
     BF <- exp(lmml(blimfit1)-lmml(blimfit2))
-    names(BF) <- "BayesFactor m1/m2"
+    names(BF) <- paste("Bayes Factor ",
+                       as.list(sys.call())[[2]],"/",
+                       as.list(sys.call())[[3]],sep = "")
     
   } else {
     
-    cat("Warning! Bootstrap Bayes Factor can take a while.")
+    cat("Warning! Bootstrap Bayes Factor can take a while. \n")
     
     # Initialise output vector
     BFs <- numeric(1000)
@@ -125,7 +127,9 @@ BF <- function(blimfit1, blimfit2, bootstrap = F, plot = F){
     
     # Output estimate and 95% interval
     BF <- c(mean(BFs),quantile(BFs, probs = c(0.025, 0.975)))
-    names(BF)[1] <- "BayesFactor m1/m2"
+    names(BF)[1] <- paste("BayesFactor ",
+                          as.list(sys.call())[[2]],"/",
+                          as.list(sys.call())[[3]],sep = "")
     
     # Plot the bootstrap distribution
     if (plot == T){
