@@ -42,7 +42,7 @@ DIC <- function(blimfit){
 
 # Bayes Factor ------------------------------------------------------------
 
-LMml <- function(blimfit){
+lmml <- function(blimfit){
   
   # Laplace - Metropolis Marginal Likelihood using median approximation
   # Markov Chain Monte Carlo in Practice by Gilks, Richardson & Spiegelhalter
@@ -84,8 +84,41 @@ LMml <- function(blimfit){
   
   hmax <- llik(medians,blimfit$X,blimfit$y)+lprior(medians)
   
+  # return the log of the estimated marginal likelihood
   return(unname(hmax+0.5*length(medians)*log(2*pi)+0.5*logdet))
   
+}
+
+
+BF <- function(blimfit1, blimfit2, bootstrap = F, plot = F){
+  
+  # Function to calculate the Bayes Factor of two (nested) models
+  
+  if (class(blimfit1) != "blimfit" ||
+      class(blimfit2) != "blimfit") stop("Please enter a blimfit object!")
+  
+  if (bootstrap == F){
+    BF <- exp(lmml(blimfit1)-lmml(blimfit2))
+    names(BF) <- "BayesFactor m1/m2"
+  } else {
+    cat("Warning! Bootstrap Bayes Factor can take a while.")
+    BFs <- numeric(1000)
+    for (i in 1:1000){
+      h1 <- blimfit1
+      h1$trace <- h1$trace[sample(nrow(h1$trace),replace = T),]
+      h2 <- blimfit2
+      h2$trace <- h2$trace[sample(nrow(h2$trace),replace = T),]
+      BFs[i]<-exp(lmml(h1)-lmml(h2))
+    }
+    BF <- c(mean(BFs),quantile(BFs, probs = c(0.025, 0.975)))
+    names(BF)[1] <- "BayesFactor m1/m2"
+    if (plot == T){
+      hist(BFs, breaks = "FD", col = "light green", border = "light green",
+           main = "Bootstrap Distribution of Bayes Factor", 
+           xlab = "Bayes Factor")
+    }
+  }
+  return(BF)
 }
 
 
