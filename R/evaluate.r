@@ -44,7 +44,7 @@ DIC <- function(blimfit){
 
 lmml <- function(blimfit){
   
-  # Laplace - Metropolis Marginal Likelihood using median approximation
+  # Laplace - Metropolis Marginal Likelihood using median approximation, from
   # Markov Chain Monte Carlo in Practice by Gilks, Richardson & Spiegelhalter
   # Page 186
   
@@ -56,7 +56,7 @@ lmml <- function(blimfit){
     sum(log(dnorm(y,X%*%theta[-1],theta[1])))
   }
   
-  # Create log(P(theta | Model))
+  # Create log(P(theta | Model)) from blimfit priors
   count <- 0
   h <- c("","")
   for (i in strsplit(blimfit$priors, "(", fixed = T)){
@@ -97,15 +97,24 @@ BF <- function(blimfit1, blimfit2, bootstrap = F, plot = F){
   # use bootstrap to see if you need more iterations for accurate estimation
   # of the bayes factor
   
+  # Check if object has class blimfit
   if (class(blimfit1) != "blimfit" ||
       class(blimfit2) != "blimfit") stop("Please enter a blimfit object!")
   
   if (bootstrap == F){
+    
+    # Calculate bayes factor. remember: lmml returns log marginal likelihood!
     BF <- exp(lmml(blimfit1)-lmml(blimfit2))
     names(BF) <- "BayesFactor m1/m2"
+    
   } else {
+    
     cat("Warning! Bootstrap Bayes Factor can take a while.")
+    
+    # Initialise output vector
     BFs <- numeric(1000)
+    
+    # Start bootstrap procedure
     for (i in 1:1000){
       h1 <- blimfit1
       h1$trace <- h1$trace[sample(nrow(h1$trace),replace = T),]
@@ -113,8 +122,12 @@ BF <- function(blimfit1, blimfit2, bootstrap = F, plot = F){
       h2$trace <- h2$trace[sample(nrow(h2$trace),replace = T),]
       BFs[i]<-exp(lmml(h1)-lmml(h2))
     }
+    
+    # Output estimate and 95% interval
     BF <- c(mean(BFs),quantile(BFs, probs = c(0.025, 0.975)))
     names(BF)[1] <- "BayesFactor m1/m2"
+    
+    # Plot the bootstrap distribution
     if (plot == T){
       hist(BFs, breaks = "FD", col = "light green", border = "light green",
            main = "Bootstrap Distribution of Bayes Factor", 
