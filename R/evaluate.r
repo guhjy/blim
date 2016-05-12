@@ -23,13 +23,13 @@ DIC <- function(blimfit){
   trace <- blimfit$trace[,-c(ncol(blimfit$trace))]
   
   # likelihood under average of parameter estimates
-  Dhat <- -2*log(prod(dnorm(blimfit$y,
+  Dhat <- -2*sum(log(dnorm(blimfit$y,
                             blimfit$X%*%colMeans(trace[,-1]),
                             mean(trace[,1]))))
   
   #  Average likelihood of model for each sample
-  Dbar <- -2*log(mean(apply(trace,1,
-                            function(x)prod(dnorm(blimfit$y,
+  Dbar <- -2*mean(apply(trace,1,
+                            function(x)sum(log(dnorm(blimfit$y,
                                                   blimfit$X%*%x[-1],
                                                   x[1])))))
   
@@ -91,7 +91,11 @@ LMml <- function(blimfit){
 
 ICBF <- function(blimfit, model = "par[1] < par[2]", complement = F){
   
-  # Inequality Constraint Bayes Factor
+  # Bayes Factor for Informative Hypotheses (e.g. comparing means)
+   
+  # A short introduction into Bayesian evaluation of informative hypotheses as
+  # an alternative to exploratory comparisons of multiple group means
+  # Beland, Klugkist, Raiche & Magis (2012)
   
   # Check if object has class blimfit
   if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
