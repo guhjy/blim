@@ -46,7 +46,7 @@ lmml <- function(blimfit){
   
   # Laplace - Metropolis Marginal Likelihood using median approximation, from
   # Markov Chain Monte Carlo in Practice by Gilks, Richardson & Spiegelhalter
-  # Page 186
+  # Page 171 & Appendix
   
   # Check if object has class blimfit
   if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
