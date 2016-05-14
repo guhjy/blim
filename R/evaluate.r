@@ -200,7 +200,11 @@ ICBF <- function(blimfit, model = "par[1] < par[2]", complement = F){
 
 # Posterior Predictive Check ----------------------------------------------
 
-DWPPC <- function(blimfit, fast = TRUE){
+PPC <- function(blimfit, fast = TRUE, type = "norm"){
+  
+  # POSSIBLE TYPES
+  # norm : a PPC for normality of residuals using ks.test
+  # dw : a PPC for autocorrelation of residuals using durbin-watson statistic
   
   # Check if object has class blimfit
   if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
@@ -209,26 +213,33 @@ DWPPC <- function(blimfit, fast = TRUE){
   # R-squared column)
   if (fast == F){
     trace <- blimfit$trace[,-c(ncol(blimfit$trace))]
-    cat("Precise PPP calculation. This might take a while! \n")
+    cat("Precise PPP calculation. This might take a while! \n\n")
   } else {
     trace <- blimfit$trace[sample(nrow(blimfit$trace),1000),
                            -c(ncol(blimfit$trace))]
     cat("Fast PPP calculation. Only 1000 iterations evaluated.
-Turn off the option 'fast' to perform a precise PPP calculation. \n")
+Turn off the option 'fast' to perform a precise PPP calculation. \n\n")
   }
   
   
   
-  # Calculate the observed discrepancy measure for each column of the trace
+  # Calculate the observed discrepancy measure for each row of the trace
   obsD <- apply(trace[,-1],1,function(b){
     # Calculate discrepancy measure
     resid <- blimfit$y-blimfit$X%*%b
+    
+    # For Durbin-Watson autocorrelation test
     auto <- resid[-1]-resid[-length(resid)]
     DW <- (t(auto)%*%auto)/(t(resid)%*%resid)
-    return(abs(DW-2))
+    Ddw <- abs(DW-2)
+    
+    # For normality of residuals: ks.test
+    Dnm <- suppressWarnings(ks.test(resid,pnorm)$statistic)
+    
+    return(c(Ddw,Dnm))
     })
   
-  # Calculate the replicated discrepancy measure for each column of the trace
+  # Calculate the replicated discrepancy measure for each row of the trace
   repD <- apply(trace,1,function(trace){
     # Assign proper parameters
     var <- trace[1]
@@ -238,13 +249,26 @@ Turn off the option 'fast' to perform a precise PPP calculation. \n")
     
     # Calculate discrepancy measure
     resid <- y-blimfit$X%*%b
+    
+    # For Durbin-Watson Autocorrelation test
     auto <- resid[-1]-resid[-length(resid)]
     DW <- (t(auto)%*%auto)/(t(resid)%*%resid)
-    return(abs(DW-2))
+    Ddw <- abs(DW-2)
+    
+    # For normality of residual: ks.test
+    Dnm <- suppressWarnings(ks.test(resid,pnorm)$statistic)
+    return(c(Ddw,Dnm))
   })
   
   # PPP is how often the observed D is smaller than replicated D
-  return(mean(obsD < repD))
+  PPPDW <- mean(obsD[1,] < repD[1,])
+  PPPNM <- mean(obsD[2,] < repD[2,])
+  
+  out <- list()
+  if (any(toupper(type)=="DW")) out$ResidualAutocorrelation <- PPPDW
+  if (any(toupper(type)=="NORM")) out$ResidualNormality <- PPPNM
+  
+  return(out)
 
 }
 
