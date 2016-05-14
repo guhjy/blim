@@ -3,19 +3,17 @@
 # rgs (Gibbs Sampling in R), rmhs (Metropolis-Hastings Sampling in R). 
 # It uses the same syntax as the lm and glm functions, using a formula
 # to specify a model with at most 1 predicted value (univariate).
-# It has options to specify method (rbr / cppbr / gs / mhs), 
+# It has options to specify method (rbr / cppbr / rgs / rmhs), 
 # verbosity (T / F) to return information, priors in the form "beta(1,1)", as 
 # well as several options such as burnin, inits, and iterations. Before running,
 # check that the above mentioned functions are loaded in the environment.
 
 # Erik-Jan van Kesteren
 
-# Function Loading --------------------------------------------------------
-
-
-blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0,
-                prior_tau = "dgamma(0.001,0.001)", prior_b = "dnorm(0,10000)", 
-                method = "cppbr", mtsprior = F, verbose = T, dtuning = F){
+blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, 
+                 thin = 0, prior_tau = "dgamma(0.001,0.001)", 
+                 prior_b = "dnorm(0,10000)", method = "cppbr", mtsprior = F, 
+                 verbose = T, dtuning = F){
   
   # Extract response vector y and data matrix X
   mf <- model.frame(formula,data)
@@ -24,9 +22,9 @@ blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
   
   # If mtsprior is indicated, calculate a minimum-training-sample prior for b
   if (mtsprior == T){
-    means <- tausq <- numeric(999)
+    means <- tausq <- numeric(9999)
     
-    for (i in 1:999){
+    for (i in 1:9999){
       v <- sample(y,2,replace = T)
       means[i] <- mean(v)
       tausq[i] <- ((v[1]-means[i])^2+(v[2]-means[i])^2)/4
@@ -63,12 +61,17 @@ blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
                             ","),
                    as.numeric)
   
-  if (length(fun_prior_b)<ncol(X)){
+  # Use only first prior if there are not enough or too many priors.
+  if (length(fun_prior_b)!=ncol(X)){
     fun_prior_b <- rep(fun_prior_b[1],ncol(X))
     args_b <- rep(args_b[1],ncol(X))
     prior_b <- rep(prior_b[1],ncol(X))
     cat("Using", prior_b[1], "as prior for all beta coefficients. \n")
   }
+  
+  
+  # Call the appropriate algorithm from the samplers.r file. Use the data 
+  # from the parsing functions above to call the functions and return the trace.
   
   if (toupper(method) == "RBR"){
       
@@ -118,16 +121,14 @@ blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
     
     result <- rmhs(iter = iter, y = y, X = X, 
                    prior_a = args_tau[[1]][1], prior_b = args_tau[[1]][2], 
-                   prior_beta = prior_b,verbose = verbose, inits = inits, 
+                   prior_beta = prior_b, verbose = verbose, inits = inits, 
                    dtuning = dtuning)
-    
-    
+    colnames(result) <- c("Variance", colnames(X), "Rsquared")
     algo <- "R based Metropolis-Hastings Sampling Regression"
+    
   } else {
     stop("Unknown method: ", toupper(method))
   }
-  
-  
   
   if (verbose == T){cat(algo, "\n")}
   
@@ -152,20 +153,23 @@ blim <- function(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
   
   for (i in 1:40){
     autocor[,i] <- apply(X = trace, MARGIN = 2,
-                     function(x) abs(cor(x[-(1:i)], 
+                         function(x) abs(cor(x[-(1:i)], 
                                          x[-((length(x)+1-i):length(x))]))
-                     )
+                         )
   }
   
   # Give the priors for the betas names before the output
   names(prior_b) <- paste("b",0:(ncol(X)-1),sep = "")
   
+  # Create an output object with all the relevant information
   blimfit <- list(algorithm = algo, 
                   summary = summary, 
                   auto = autocor, 
                   y = y, X = X, 
                   trace = trace, 
                   priors = c(prior_tau,prior_b))
+  
+  # Give it a classy class.
   class(blimfit) <- "blimfit"
   
   return(blimfit)

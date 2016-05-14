@@ -22,16 +22,16 @@ DIC <- function(blimfit){
   # R-squared column)
   trace <- blimfit$trace[,-c(ncol(blimfit$trace))]
   
-  # likelihood under average of parameter estimates
+  # loglikelihood under average of parameter estimates
   Dhat <- -2*sum(log(dnorm(blimfit$y,
-                            blimfit$X%*%colMeans(trace[,-1]),
-                            mean(trace[,1]))))
+                           blimfit$X%*%colMeans(trace[,-1]),
+                           mean(trace[,1]))))
   
-  #  Average likelihood of model for each sample
+  #  Average loglikelihood of model for each sample
   Dbar <- -2*mean(apply(trace,1,
-                            function(x)sum(log(dnorm(blimfit$y,
-                                                  blimfit$X%*%x[-1],
-                                                  x[1])))))
+                        function(x)sum(log(dnorm(blimfit$y,
+                                                 blimfit$X%*%x[-1],
+                                                 x[1])))))
   
   DIC <- Dhat + 2 * (Dbar - Dhat)
   
@@ -205,6 +205,10 @@ PPC <- function(blimfit, fast = TRUE, type = "norm"){
   # POSSIBLE TYPES
   # norm : a PPC for normality of residuals using ks.test
   # dw : a PPC for autocorrelation of residuals using durbin-watson statistic
+  # more types are very easy to add. just create a function of the data or of 
+  # the residuals that returns a discrepancy measure and add it in the apply
+  # of ObsD and RepD. That adds a row to each of these, which can then be 
+  # checked.
   
   # Check if object has class blimfit
   if (class(blimfit) != "blimfit") stop("Please enter a blimfit object!")
@@ -257,6 +261,7 @@ Turn off the option 'fast' to perform a precise PPP calculation. \n\n")
     
     # For normality of residual: ks.test
     Dnm <- suppressWarnings(ks.test(resid,pnorm)$statistic)
+    
     return(c(Ddw,Dnm))
   })
   
@@ -332,8 +337,8 @@ aplots <- function(blimfit, params = NULL){
   
   # MH warning message
   if (blimfit$algorithm == "R based Metropolis-Hastings Sampling Regression"){
-    cat("Note that Metropolis-Hastings sampling leads to high autocorrelation!
-Check that acceptance rates are between 0.15 and 0.5 in console at blim output.",
+    cat("Check that acceptance rates are between 0.15 and 0.5 in console at blim 
+output.",
         "\n")
   }
   
