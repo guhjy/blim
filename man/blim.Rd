@@ -27,14 +27,14 @@ blim(formula, data, iter = 9999, burnin = 50, inits = NULL, thin = 0
 \item{prior_b}{ (vector of) priors for beta coefficients. With
                 \code{method = "rmhs"}, nonconjugate priors are allowed. Any
                 density function works, as long as it has a d and an r method. }
-\item{method}{ cppbr = Bayes Regression in C++, rbr = Bayes Regression in R
+\item{method}{ cppbr = Bayes Regression in C++, rbr = Bayes Regression in R,
                rgs = Bayesian Regression under Gibbs Sampling,
-               rmhs = Bayesian Regression under Gibbs Sampling with Metropolis-
-               Hastings step for Nonconjugate Priors }
+               rmhs = Bayesian Regression under Gibbs Sampling with 
+               Metropolis-Hastings step for Nonconjugate Priors }
 \item{mtsprior}{ Boolean value indicating whether a Minimum Training Sample
                  prior should be calculated. For use in conjuction with ANOVA &
                  Bayes Factors for informative hypotheses }
-\item{vebose}{ print all info in the console or not }
+\item{verbose}{ print all info in the console or not (in development!) }
 \item{dtuning}{ dynamic tuning of the random walk Metropolis-Hastings step }
 }
 
@@ -46,7 +46,13 @@ An object of class \code{blimfit}, including all necessary information such as
 summary, trace and original data.
 }
 \references{
-%% ~put references to the literature/web site here ~
+Beland, S., Klugkist, I., Raiche, G. & Magis, D. (2012). A short introduction 
+into Bayesian evaluation of informative hypotheses as an alternative to 
+exploratory comparisons of multiple group means. Tutorials in Quantitative 
+Methods for Psychology 8(2), p. 122-126.
+
+Raftery, A. E. (1996). Hypothesis testing and model selection. Markov chain 
+Monte Carlo in practice, 163-188.
 }
 \author{
 Erik-Jan van Kesteren
@@ -59,21 +65,35 @@ Erik-Jan van Kesteren
 
 \seealso{
 \code{\link{cplots}}, \code{\link{aplots}}, \code{\link{BF}}, 
-\code{\link{DWPPC}}
+\code{\link{PPC}}, \code{\link{ICBF}}, \code{\link{DIC}}
 }
 \examples{
 # Most simple example with full functionality
 fit1 <- blim(dist~speed, data=cars)
+
 summary(fit1)
 
 # More complex example with nonconjugate priors
-fit2 <- blim(formula = dist~speed, data = cars, iter = 50000, burnin = 2000,
+fit2 <- blim(formula = dist~speed, data = cars, iter = 9999, burnin = 100,
              inits = list(var = 200, b0 = -15, b1 = 3), thin = 0,
              prior_tau = "dgamma(0.001,0.001)",
              prior_b = c("dcauchy(0,2000)", "dunif(3,4.5)"),
              method = "rmhs", dtuning = 1000)
 
 summary(fit2)
+
+# check convergence and autocorrelation
+cplots(fit2)
+aplots(fit2)
+
+# calculate Bayes Factor of model 2 versus model 1
+BF(fit2, fit1)
+
+# perform posterior predictive check for normality of residuals
+PPC(fit2)
+
+# evaluate informative hypothesis in model 1
+ICBF(fit1, model = "par[1] < par[2]", complement = TRUE)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
