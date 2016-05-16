@@ -83,8 +83,8 @@ fit2 <- blim(formula = dist~speed, data = cars, iter = 9999, burnin = 100,
 summary(fit2)
 
 # check convergence and autocorrelation
-cplots(fit2)
-aplots(fit2)
+cplots(fit1)
+aplots(fit1)
 
 # calculate Bayes Factor of model 2 versus model 1
 BF(fit2, fit1)
