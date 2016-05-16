@@ -305,8 +305,6 @@ rmhs <- function(iter = 999, y, X, prior_a, prior_b, prior_beta,
         # Assign when accepted
         if (runif(1) <= r){
           bhat[v] <- bstar
-        } else {
-          bhat[v] <- bhat[v]
         }
         
         # Dynamic tuning procedure using information from
