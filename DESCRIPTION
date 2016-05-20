@@ -6,6 +6,7 @@ Date: 2016-04-28
 Author: Erik-Jan van Kesteren
 Maintainer: Erik-Jan van Kesteren <erikjan.vankesteren@protonmail.com>
 Description: Package to Perform Univariate Bayesian Linear Modelling in R.
-License: opensource.org/licenses/MIT
-Imports: Rcpp (>= 0.12.4), mvtnorm
+License: MIT
+Depends: MASS, plyr
+Imports: Rcpp (>= 0.12.4)
 LinkingTo: Rcpp, RcppArmadillo

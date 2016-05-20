@@ -171,7 +171,6 @@ ICBF <- function(blimfit, model = "par[1] < par[2]", complement = F){
                   nrow = nrow(trace))
   
 
-  
   # Evaluate fit of the hypothesis
   fa <- mean(apply(trace, 1, function(par) eval(parse(text=model))))
   
