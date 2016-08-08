@@ -1,0 +1,6 @@
+{
+  "name": "Blim",
+  "tagline": "Univariate Bayesian Linear Modelling",
+  "body": "# blim\r\nUnivariate Bayesian Linear Modelling made approachable for anyone: `blim()` works just like `lm()`!\r\n\r\n## how to install\r\n\r\nHas been tested on 64 bit R 3.2.5. Not guaranteed to work on other versions of R! Rtools is required for installation as a package. If you don't have it, you can download it from https://cran.r-project.org/bin/windows/Rtools/\r\n\r\n```R\r\n# install and load blim\r\nlibrary(devtools) # Required for installation\r\ninstall_github(\"vankesteren/blim\") # Install my package from github\r\nlibrary(blim) # Load this package\r\nlibrary(MASS) # forgot to add MASS in the package\r\n# for usage:\r\n?blim\r\n```\r\n\r\n# Instruction Poster \r\n\r\n![poster](https://raw.githubusercontent.com/vankesteren/blim/master/doc/Poster.jpg)",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
